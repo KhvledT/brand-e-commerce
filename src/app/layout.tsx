@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${zenDots.variable} font-sans antialiased`}
+        className={`${inter.variable} ${zenDots.variable} font-sans antialiased bg-gray-50 text-gray-900`}
       >
         <div className="flex flex-col min-h-screen">
           <AnnouncementBar />
