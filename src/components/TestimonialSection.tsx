@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 // Import images
-import category1 from '@/assets/imgs/home page imgs/category-1.jpg';
 import category2 from '@/assets/imgs/home page imgs/category-2.jpg';
 import category3 from '@/assets/imgs/home page imgs/category-3.jpg';
 
@@ -26,22 +25,6 @@ const testimonials = [
 ];
 
 const TestimonialSection = () => {
-  const [api, setApi] = useState<any>();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
-
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api]);
 
   return (
     <>
@@ -50,7 +33,6 @@ const TestimonialSection = () => {
         {/* Desktop Layout */}
         <div className="hidden md:block">
           <Carousel
-            setApi={setApi}
             opts={{
               align: "start",
               loop: true,
@@ -76,7 +58,7 @@ const TestimonialSection = () => {
                       
                       {/* Quote */}
                       <blockquote className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
-                        "{testimonial.quote}"
+                        {testimonial.quote}
                       </blockquote>
                     </div>
 
@@ -118,7 +100,6 @@ const TestimonialSection = () => {
           </div>
           
           <Carousel
-            setApi={setApi}
             opts={{
               align: "start",
               loop: true,
@@ -131,7 +112,7 @@ const TestimonialSection = () => {
                   <div className="space-y-4">
                     {/* Quote */}
                     <blockquote className="text-xl font-bold text-gray-900 leading-tight">
-                      "{testimonial.quote}"
+                      {testimonial.quote}
                     </blockquote>
                     
                     {/* Product Image */}
