@@ -5,7 +5,7 @@ import section12 from '@/assets/imgs/home page imgs/Frame 492.svg';
 export default function UtiliySectionForMobile() {
   return (
     <section className=" w-full">
-        <div className="relative w-full h-[70vh] sm:hidden overflow-hidden my-15">
+        <div className="relative w-full h-[60vh] sm:hidden overflow-hidden my-15">
           <Image
             src={section12} 
             alt="section11" 
