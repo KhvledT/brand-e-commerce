@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Zen_Dots } from "next/font/google";
 import "./globals.css";
+import HeaderNav from "@/components/HeaderNav";
+import PageFooter from "@/components/PageFooter";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,7 +31,12 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${zenDots.variable} font-sans antialiased`}
       >
-        {children}
+        <div className="flex flex-col min-h-screen">
+          <AnnouncementBar />
+          <HeaderNav />
+            {children}
+          <PageFooter />
+        </div>
       </body>
     </html>
   );

@@ -1,12 +1,25 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 const HeaderNav = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activePrimaryNav, setActivePrimaryNav] = useState('Home');
   const [activeSecondaryNav, setActiveSecondaryNav] = useState('New Arrivals');
+  const pathname = usePathname();
+
+  // Set active navigation based on current pathname
+  useEffect(() => {
+    if (pathname === '/') {
+      setActivePrimaryNav('Home');
+    } else if (pathname === '/about') {
+      setActivePrimaryNav('About');
+    } else if (pathname === '/categories') {
+      setActivePrimaryNav('Categories');
+    }
+  }, [pathname]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -15,7 +28,7 @@ const HeaderNav = () => {
   const primaryNavItems = [
     { name: 'Categories', href: '#' },
     { name: 'About', href: '#' },
-    { name: 'Home', href: '#' },
+    { name: 'Home', href: '/' },
   ];
 
   const secondaryNavItems = [
@@ -31,17 +44,17 @@ const HeaderNav = () => {
 
   const getActivePrimaryStyles = (itemName: string) => {
     if (itemName === 'Home') {
-      return activePrimaryNav === itemName 
-        ? 'font-medium border-b-2 border-black text-black' 
-        : 'font-medium hover:text-gray-600 hover:border-b-2 hover:border-gray-300';
+      return pathname === '/' 
+        ? 'font-medium border-b-2 border-black text-black'
+        : 'font-medium hover:text-gray-600  hover:border-gray-300';
     } else if (itemName === 'Categories') {
       return activePrimaryNav === itemName 
         ? 'font-medium border-b-2 border-gray-500 text-gray-700' 
-        : 'font-medium hover:text-gray-600 hover:border-b-2 hover:border-gray-300';
+        : 'font-medium hover:text-gray-600  hover:border-gray-300';
     } else if (itemName === 'About') {
       return activePrimaryNav === itemName 
         ? 'font-medium border-b-2 border-green-500 text-green-600' 
-        : 'font-medium hover:text-gray-600 hover:border-b-2 hover:border-gray-300';
+        : 'font-medium hover:text-gray-600  hover:border-gray-300';
     }
     return 'font-medium hover:text-gray-600';
   };
@@ -49,25 +62,13 @@ const HeaderNav = () => {
   const getActiveSecondaryStyles = (item: { name: string; isSale?: boolean }) => {
     if (item.isSale) {
       return activeSecondaryNav === item.name 
-        ? 'font-medium text-red-600 border-b-2 border-red-500' 
-        : 'font-medium text-red-500 hover:text-red-600 hover:border-b-2 hover:border-red-300';
+        ? 'font-medium text-red-600 border-red-500' 
+        : 'font-medium text-red-500 hover:text-red-600 ';
     }
     
-    const colors = {
-      'New Arrivals': 'gray',
-      'Best-Sellers': 'green', 
-      'Clothing': 'purple',
-      'Tops & Sweaters': 'indigo',
-      'Pants & Jeans': 'teal',
-      'Outerwear': 'orange',
-      'Shoes & Bags': 'pink'
-    };
-    
-    const color = colors[item.name as keyof typeof colors] || 'gray';
-    
     return activeSecondaryNav === item.name 
-      ? `font-medium text-${color}-600 ` 
-      : `font-medium text-gray-500 hover:text-${color}-600 hover:border-b-2 hover:border-${color}-300`;
+      ? `font-medium text-gray-500 ` 
+      : `font-medium text-gray-500 hover:text-gray-600 `;
   };
 
   return (

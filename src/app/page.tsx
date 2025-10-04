@@ -1,23 +1,32 @@
-import AnnouncementBar from "@/components/AnnouncementBar";
-import HeaderNav from "@/components/HeaderNav";
-import HeroBanner from "@/components/HeroBanner";
-import CategoryGrid from "@/components/CategoryGrid";
-import ProductCarousel from "@/components/ProductCarousel";
-import TestimonialCarousel from "@/components/TestimonialCarousel";
-import UtilitySection from "@/components/UtilitySection";
-import PageFooter from "@/components/PageFooter";
+'use client';
+import React from 'react';
+import HeroSection from '@/components/heroSection';
+import CategoryBanners from '@/components/CategoryBanners';
+import UtilitySection from '@/components/UtilitySection';
+import TestimonialSection from '@/components/TestimonialSection';
+import UtiliySectionForMobile from '@/components/UtiliySectionForMobile';
 
-export default function Home() {
+
+
+const HomePage = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      <AnnouncementBar />
-      <HeaderNav />
-      <main>
-        <HeroBanner />
-        <CategoryGrid />
-        <ProductCarousel />
-      </main>
-      <PageFooter />
-    </div>
+    <>
+      <div className="">
+        <HeroSection />
+        
+        <CategoryBanners />
+
+        {/* Testimonial & Utility Section */}
+        <section className=" py-16 bg-[#EEEAE7]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <UtilitySection />
+            <TestimonialSection />
+            <UtiliySectionForMobile />
+          </div>
+        </section>
+      </div>
+    </>
   );
-}
+};
+
+export default HomePage;
