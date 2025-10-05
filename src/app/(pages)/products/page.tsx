@@ -1,98 +1,209 @@
 "use client";
-import React from "react";
-import { Search,X } from "lucide-react";
-import Image from "@/assets/imgs/category-6.png";
+import React, { useState, useMemo } from "react";
+import Link from "next/link";
+import Modal from "@/components/ui/Modal";
+import QuickViewModal from "@/components/QuickViewModal";
+import BackToTop from "@/components/BackToTop";
 import FilterSidebar from "@/components/plp/FilterSidebar";
 import MobileFiltersDrawer from "@/components/plp/MobileFiltersDrawer";
 import PLPToolbar from "@/components/plp/PLPToolbar";
 import ProductGrid from "@/components/plp/ProductGrid";
 import Pagination from "@/components/plp/Pagination";
+import type { StaticImageData } from "next/image";
 
-const fakeProducts = Array.from({ length: 12 }).map((_, i) => ({
+// Import different product images for variety
+import category1 from "@/assets/imgs/category-1.png";
+import category2 from "@/assets/imgs/category-2.png";
+import category3 from "@/assets/imgs/category-3.png";
+import category4 from "@/assets/imgs/category-4.png";
+import category5 from "@/assets/imgs/category-5.png";
+import category6 from "@/assets/imgs/category-6.png";
+
+// Fake products with variety
+const productImages = [category1, category2, category3, category4, category5, category6];
+const productNames = [
+  "The Cashmere Crew",
+  "Organic Cotton Tee",
+  "The Day Heel",
+  "The Performance Chino",
+  "The Quilted Coat",
+  "The Wool Sweater",
+  "Italian Leather Tote",
+  "The Silk Shirt",
+  "Modern Loafer",
+  "The Perfect Jean",
+  "Cashmere Beanie",
+  "The Classic Tee",
+];
+
+const fakeProducts = Array.from({ length: 24 }).map((_, i) => ({
   id: i + 1,
-  name: "Shimmery Shirt",
-  price: "$200",
-  imageSrc: Image, // using pink bg placeholder as per spec
+  name: productNames[i % productNames.length],
+  price: Math.floor(Math.random() * (200 - 35) + 35),
+  imageSrc: productImages[i % productImages.length],
 }));
 
+type SortOption = "popular" | "price-asc" | "price-desc" | "newest";
+
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  imageSrc: string | StaticImageData;
+};
+
+// SEO Metadata (would be exported from layout in real implementation)
+const pageMetadata = {
+  title: "Shop All Products | Everlane - Quality Modern Essentials",
+  description: "Discover our full collection of sustainable, ethically-made clothing and accessories. Shop quality essentials at transparent prices with free shipping on orders over $50.",
+};
+
+// Structured Data for SEO
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'All Products',
+  description: 'Shop our complete collection of sustainable fashion',
+  url: typeof window !== 'undefined' ? window.location.href : '',
+};
+
 export default function ProductsPage() {
-  const [filtersOpen, setFiltersOpen] = React.useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>("popular");
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 12;
+
+  // Sort products
+  const sortedProducts = useMemo(() => {
+    const products = [...fakeProducts];
+    
+    switch (sortBy) {
+      case "price-asc":
+        return products.sort((a, b) => a.price - b.price);
+      case "price-desc":
+        return products.sort((a, b) => b.price - a.price);
+      case "newest":
+        return products.reverse();
+      case "popular":
+      default:
+        return products;
+    }
+  }, [sortBy]);
+
+  // Paginate products
+  const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
+  const paginatedProducts = sortedProducts.slice(
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage
+  );
+
+  const handleSortChange = (value: SortOption) => {
+    setSortBy(value);
+    setCurrentPage(1); // Reset to first page when sorting
+  };
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleQuickView = (product: { id: number | string; name: string; price: string | number; imageSrc?: string | StaticImageData }) => {
+    const numericPrice = typeof product.price === 'string' ? parseInt(product.price.replace('$', '')) : product.price;
+    setQuickViewProduct({
+      id: typeof product.id === 'string' ? parseInt(product.id) : product.id,
+      name: product.name,
+      price: numericPrice,
+      imageSrc: product.imageSrc || category1
+    });
+  };
+
   return (
-    <main className="bg-[#EEEAE7] text-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
-          {/* Sidebar */}
-          <FilterSidebar />
+    <>
+      {/* SEO Head Elements */}
+      <title>{pageMetadata.title}</title>
+      <meta name="description" content={pageMetadata.description} />
+      
+      {/* Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
 
-          {/* Main content */}
-          <section className="flex-1">
-            <PLPToolbar onOpenFilters={() => setFiltersOpen(true)} />
+      <Modal 
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        message="This feature will be in the real version"
+      />
 
-            {/* Mobile/Tablet Filters Drawer */}
-            {filtersOpen && (
-              <div className="fixed inset-0 z-50 lg:hidden">
-                <div onClick={() => setFiltersOpen(false)} className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-y-0 left-0 w-80 max-w-[85%] bg-white shadow-xl p-4 overflow-y-auto">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-base font-medium">Filters</h3>
-                    <button aria-label="Close filters" onClick={() => setFiltersOpen(false)} className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-200">
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
+      <QuickViewModal
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        product={quickViewProduct ? { ...quickViewProduct, price: `$${quickViewProduct.price}` } : null}
+      />
 
-                  {/* Search inside drawer for mobile/tablet */}
-                  <div className="relative mb-6">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      placeholder="Search for anything..."
-                      className="w-full h-10 rounded-md border border-gray-300 bg-white pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900"
-                    />
-                  </div>
+      <BackToTop />
 
-                  {/* Same filters as desktop */}
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-sm font-medium mb-3">Category</h3>
-                      <div className="space-y-2 text-sm">
-                        {["T-shirts", "Shorts", "Shirts", "Hoodie", "Jeans"].map((c, idx) => (
-                          <label key={c} className="flex items-center gap-2">
-                            <input type="radio" name="m-category" defaultChecked={idx === 0} className="h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900" />
-                            <span>{c}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
+      <main className="bg-[#EEEAE7] text-gray-900">
+        {/* Breadcrumbs */}
+        <nav aria-label="Breadcrumb" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <ol className="flex items-center space-x-2 text-sm">
+            <li>
+              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
+                Home
+              </Link>
+            </li>
+            <li className="text-gray-400">/</li>
+            <li className="text-gray-900 font-medium" aria-current="page">
+              All Products
+            </li>
+          </ol>
+        </nav>
 
-                    <div className="border-t border-gray-200 pt-6">
-                      <h3 className="text-sm font-medium mb-3">Price Range</h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        <input placeholder="Min price" className="h-9 rounded-md border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900" />
-                        <input placeholder="Max price" className="h-9 rounded-md border border-gray-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900" />
-                      </div>
-                    </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          <div className="flex gap-8">
+            {/* Sidebar */}
+            <FilterSidebar onFilterClick={handleModalOpen} />
 
-                    <div className="border-t border-gray-200 pt-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-medium">Colors</h3>
-                      </div>
-                      <div className="flex flex-wrap gap-3">
-                        {["#ef4444", "#22c55e", "#10b981", "#f59e0b", "#fbbf24", "#eab308", "#3b82f6", "#8b5cf6", "#06b6d4", "#111827", "#ffffff"].map((color, idx) => (
-                          <button key={color} className={`h-5 w-5 rounded-full ring-1 ring-inset ${idx === 5 ? "ring-gray-900" : "ring-gray-300"}`} style={{ backgroundColor: color }} aria-label={`Filter ${color}`} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Main content */}
+            <section className="flex-1">
+              <PLPToolbar 
+                onOpenFilters={() => setFiltersOpen(true)}
+                onSearchClick={handleModalOpen}
+                onSortChange={handleSortChange}
+                currentSort={sortBy}
+                totalResults={sortedProducts.length}
+              />
 
-            <ProductGrid products={fakeProducts} />
+              <ProductGrid 
+                products={paginatedProducts.map(p => ({
+                  ...p,
+                  price: `$${p.price}`
+                }))} 
+                onQuickView={handleQuickView}
+              />
 
-            <Pagination />
-          </section>
+              <Pagination 
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                onModalOpen={handleModalOpen}
+              />
+            </section>
+          </div>
         </div>
-      </div>
-      <MobileFiltersDrawer open={filtersOpen} onClose={() => setFiltersOpen(false)} />
-    </main>
+      </main>
+
+      <MobileFiltersDrawer 
+        open={filtersOpen} 
+        onClose={() => setFiltersOpen(false)}
+        onFilterClick={handleModalOpen}
+        onSearchClick={handleModalOpen}
+      />
+    </>
   );
 }
