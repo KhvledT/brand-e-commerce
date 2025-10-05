@@ -112,11 +112,11 @@ const TestimonialSection = () => {
               ))}
             </CarouselContent>
             <CarouselPrevious 
-              className="hidden lg:block lg:-left-15 xl:-left-20 2xl:-left-30 bg-transparent border-none shadow-none" 
+              className="hidden lg:block lg:-left-15 xl:-left-20 2xl:-left-30 bg-transparent border-none shadow-none hover:bg-transparent" 
               aria-label="Previous testimonial"
             />
             <CarouselNext 
-              className="hidden lg:block lg:-right-15 xl:-right-20 2xl:-right-30 bg-transparent border-none shadow-none" 
+              className="hidden lg:block lg:-right-15 xl:-right-20 2xl:-right-30 bg-transparent border-none shadow-none hover:bg-transparent" 
               aria-label="Next testimonial"
             />
           </Carousel>

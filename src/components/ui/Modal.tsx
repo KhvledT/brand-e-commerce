@@ -6,9 +6,10 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   message: string;
+  children?: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message, children }) => {
   // Close on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -78,16 +79,20 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message }) => {
               {title}
             </h3>
           )}
-          <p className="text-gray-600 text-base leading-relaxed mb-6">
-            {message}
-          </p>
-          <button
-            onClick={onClose}
-            className="px-6 py-2.5 bg-black text-white rounded-md hover:bg-gray-800 transition-colors duration-200 font-medium"
-          >
-            Got it
-          </button>
-        </div>
+                  <p className="text-gray-600 text-base leading-relaxed mb-6">
+                    {message}
+                  </p>
+                  {children ? (
+                    children
+                  ) : (
+                    <button
+                      onClick={onClose}
+                      className="px-6 py-2.5 bg-black text-white rounded-md hover:bg-gray-800 transition-colors duration-200 font-medium"
+                    >
+                      Got it
+                    </button>
+                  )}
+                </div>
       </div>
     </div>
   );

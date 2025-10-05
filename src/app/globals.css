@@ -140,4 +140,44 @@ body {
   .animate-fadeInUp {
     animation: fadeInUp 0.4s ease-out;
   }
+
+  /* Cart item fade-out animation */
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+  }
+
+  .animate-fadeOut {
+    animation: fadeOut 0.3s ease-out forwards;
+  }
+
+  /* Pulse animation for quantity changes */
+  @keyframes pulse-once {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  .animate-pulse-once {
+    animation: pulse-once 0.3s ease-in-out;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
 }

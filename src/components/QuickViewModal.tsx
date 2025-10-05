@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import Image, { StaticImageData } from "next/image";
 import { X, Heart, ShoppingCart } from "lucide-react";
+import Link from "next/link";
 
 type Product = {
   id: number | string;
@@ -136,12 +137,12 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
                 <Heart className="h-5 w-5" />
                 Add to Wishlist
               </button>
-              <a
+              <Link
                 href={`/products/${product.id}`}
                 className="block text-center w-full px-6 py-3 text-gray-900 font-medium hover:underline"
               >
                 View Full Details →
-              </a>
+              </Link>
             </div>
           </div>
         </div>

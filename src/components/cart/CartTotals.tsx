@@ -9,21 +9,21 @@ type Totals = {
   tax: number;
 };
 
-type CardTotalsProps = {
+type CartTotalsProps = {
   totals: Totals;
   onCheckout?: () => void;
 };
 
-export default function CardTotals({ totals, onCheckout }: CardTotalsProps) {
+export default function CartTotals({ totals, onCheckout }: CartTotalsProps) {
   const grandTotal = useMemo(() => {
     return totals.subTotal - totals.discount + totals.tax + totals.shipping;
   }, [totals]);
 
-  const currency = (n: number) => `$${n.toFixed(2)}`;
+  const currency = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
   return (
-    <aside className="bg-white rounded-md border border-gray-200 p-5">
-      <h3 className="text-base font-semibold mb-4">Card Totals</h3>
+    <section className="bg-white rounded-md border border-gray-200 p-5 shadow-sm" aria-labelledby="cart-totals-heading">
+      <h2 id="cart-totals-heading" className="text-base font-semibold mb-4">Cart Totals</h2>
 
       <dl className="space-y-3 text-sm">
         <div className="flex items-center justify-between">
@@ -36,7 +36,7 @@ export default function CardTotals({ totals, onCheckout }: CardTotalsProps) {
         </div>
         <div className="flex items-center justify-between">
           <dt className="text-gray-600">Discount</dt>
-          <dd className="text-gray-900">{currency(totals.discount)}</dd>
+          <dd className="text-green-600">-{currency(totals.discount)}</dd>
         </div>
         <div className="flex items-center justify-between">
           <dt className="text-gray-600">Tax</dt>
@@ -46,20 +46,20 @@ export default function CardTotals({ totals, onCheckout }: CardTotalsProps) {
 
       <div className="my-4 border-t border-gray-200" />
 
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-gray-600">Total</span>
-        <span className="font-semibold">{currency(grandTotal)} USD</span>
+      <div className="flex items-center justify-between text-base" aria-live="polite">
+        <span className="text-gray-900 font-semibold">Total</span>
+        <span className="font-bold text-lg">{currency(grandTotal)}</span>
       </div>
 
       <button
         onClick={onCheckout}
-        className="mt-5 w-full inline-flex items-center justify-center h-11 rounded-[3px] bg-gray-900 text-white hover:bg-gray-800 text-sm"
+        className="mt-5 w-full inline-flex items-center justify-center h-11 rounded-[3px] bg-gray-900 text-white hover:bg-gray-800 transition-all duration-200 hover:scale-105 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+        aria-label="Proceed to checkout"
       >
         PROCEED TO CHECKOUT
        <ArrowRight className="h-4 w-4 ml-2" />
       </button>
-    </aside>
+    </section>
   );
 }
-
 
