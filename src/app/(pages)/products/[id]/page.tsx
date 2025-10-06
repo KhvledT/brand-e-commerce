@@ -3,8 +3,6 @@ import React from "react";
 import Link from "next/link";
 import ProductGallery from "@/components/pdp/ProductGallery";
 import ProductInfo from "@/components/pdp/ProductInfo";
-import ProductTabs from "@/components/pdp/ProductTabs";
-import ReviewsSection from "@/components/pdp/ReviewsSection";
 import ProductGrid from "@/components/plp/ProductGrid";
 import BackToTop from "@/components/BackToTop";
 import productDetailsImage from "@/assets/imgs/productDetailsImage.png";
@@ -155,22 +153,6 @@ export default function PDPPage() {
               stockStatus="in-stock"
             />
           </div>
-
-          {/* Product Tabs */}
-          <ProductTabs
-            description={productDescription}
-            fabric="PQ (Premium Quality Cotton)"
-            careInstructions={careInstructions}
-            reviewsContent={
-              <ReviewsSection
-                averageRating={4.8}
-                totalReviews={127}
-                reviews={demoReviews}
-                onWriteReview={() => alert("Write review modal would open")}
-              />
-            }
-            reviewCount={127}
-          />
 
           {/* Related Products */}
           <section className="mt-20 border-t border-gray-400 pt-16" aria-labelledby="related-heading">
