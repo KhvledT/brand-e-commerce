@@ -50,7 +50,7 @@ export default function ProductGrid({ products, isLoading = false, onQuickView }
   // Show loading skeletons
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: 6 }).map((_, i) => (
           <ProductSkeleton key={i} />
         ))}
@@ -69,7 +69,7 @@ export default function ProductGrid({ products, isLoading = false, onQuickView }
 
   // Show products with stagger animation
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((p, index) => (
         <div
           key={p.id}

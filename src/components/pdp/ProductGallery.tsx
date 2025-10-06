@@ -82,7 +82,7 @@ export default function ProductGallery({ images, productName = "Product" }: Prod
 
       {/* Thumbnails */}
       <div
-        className="mt-4 ml-2 flex gap-3 overflow-x-auto lg:overflow-visible lg:mt-0 lg:absolute lg:-left-[35px] lg:top-0 lg:flex-col scrollbar-hide"
+        className="mt-4 ml-2 py-4 flex gap-3 overflow-x-auto lg:overflow-visible lg:mt-0 lg:absolute lg:-left-[35px] lg:top-0 lg:flex-col scrollbar-hide"
         role="tablist"
         aria-label="Product image thumbnails"
       >
@@ -95,7 +95,7 @@ export default function ProductGallery({ images, productName = "Product" }: Prod
             aria-selected={active === idx}
             aria-label={`View image ${idx + 1}`}
             aria-current={active === idx}
-              className={`relative h-16 w-16 lg:h-[60px] lg:w-[60px] shrink-0 rounded-sm overflow-hidden transition-all duration-200 ${
+              className={`relative h-16 ml-2 lg:ml-0 w-16 lg:h-[60px] lg:w-[60px] shrink-0 rounded-sm overflow-hidden transition-all duration-200 ${
               active === idx
                 ? "ring-2 ring-gray-900 scale-105"
                 : "ring-1 ring-gray-300 hover:ring-gray-400 hover:scale-105"
