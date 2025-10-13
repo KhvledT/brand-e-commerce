@@ -1,14 +1,7 @@
 "use client";
 import React from "react";
 import ProductCard from "@/components/ProductCard";
-import type { StaticImageData } from "next/image";
-
-type Product = {
-  id: number | string;
-  name: string;
-  price: string;
-  imageSrc?: string | StaticImageData;
-};
+import { Product } from "@/types";
 
 type ProductGridProps = {
   products: Product[];

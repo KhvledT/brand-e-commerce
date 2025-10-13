@@ -1,15 +1,12 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { X, Heart, ShoppingCart } from "lucide-react";
 import Link from "next/link";
-
-type Product = {
-  id: number | string;
-  name: string;
-  price: string;
-  imageSrc?: string | StaticImageData;
-};
+import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
+import { Product } from "@/types";
+import Toast, { ToastType } from "./ui/Toast";
 
 type QuickViewModalProps = {
   isOpen: boolean;
@@ -18,6 +15,10 @@ type QuickViewModalProps = {
 };
 
 export default function QuickViewModal({ isOpen, onClose, product }: QuickViewModalProps) {
+  const { addItem } = useCart();
+  const { toggleItem, isInWishlist } = useWishlist();
+  const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+  const [size, setSize] = useState("M");
   // Close on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -37,15 +38,59 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
     };
   }, [isOpen, onClose]);
 
+  const handleAddToCart = () => {
+    if (!product) return;
+    const cartItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      imageSrc: product.imageSrc || '',
+      quantity: 1,
+      size,
+    };
+    addItem(cartItem);
+    setToast({ message: `${product.name} added to cart!`, type: 'success' });
+  };
+
+  const handleToggleWishlist = () => {
+    if (!product) return;
+    const wishlistItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      imageSrc: product.imageSrc || '',
+    };
+    toggleItem(wishlistItem);
+    setToast({ 
+      message: isInWishlist(product.id) 
+        ? `${product.name} removed from wishlist` 
+        : `${product.name} added to wishlist!`, 
+      type: 'success' 
+    });
+  };
+
   if (!isOpen || !product) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="quick-view-title"
-    >
+    <>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          isOpen={!!toast}
+          onClose={() => setToast(null)}
+          duration={2500}
+        />
+      )}
+
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="quick-view-title"
+      >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
@@ -115,12 +160,17 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-900 mb-2">Size</label>
                 <div className="flex gap-2">
-                  {["XS", "S", "M", "L", "XL"].map((size) => (
+                  {["XS", "S", "M", "L", "XL"].map((s) => (
                     <button
-                      key={size}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium hover:border-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-900"
+                      key={s}
+                      onClick={() => setSize(s)}
+                      className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gray-900 ${
+                        size === s
+                          ? "border-gray-900 bg-gray-900 text-white"
+                          : "border-gray-300 text-gray-900 hover:border-gray-900"
+                      }`}
                     >
-                      {size}
+                      {s}
                     </button>
                   ))}
                 </div>
@@ -129,13 +179,23 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              <button className="w-full px-6 py-3 bg-gray-900 text-white font-medium rounded-md hover:bg-gray-800 transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2">
+              <button 
+                onClick={handleAddToCart}
+                className="w-full px-6 py-3 bg-gray-900 text-white font-medium rounded-md hover:bg-gray-800 transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
+              >
                 <ShoppingCart className="h-5 w-5" />
                 Add to Cart
               </button>
-              <button className="w-full px-6 py-3 border-2 border-gray-900 text-gray-900 font-medium rounded-md hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2">
-                <Heart className="h-5 w-5" />
-                Add to Wishlist
+              <button 
+                onClick={handleToggleWishlist}
+                className={`w-full px-6 py-3 border-2 font-medium rounded-md transition-all duration-200 flex items-center justify-center gap-2 ${
+                  isInWishlist(product.id)
+                    ? "border-red-600 bg-red-600 text-white hover:bg-red-700 hover:border-red-700"
+                    : "border-gray-900 text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <Heart className="h-5 w-5" fill={isInWishlist(product.id) ? "currentColor" : "none"} />
+                {isInWishlist(product.id) ? "In Wishlist" : "Add to Wishlist"}
               </button>
               <Link
                 href={`/products/${product.id}`}
@@ -148,6 +208,7 @@ export default function QuickViewModal({ isOpen, onClose, product }: QuickViewMo
         </div>
       </div>
     </div>
+    </>
   );
 }
 

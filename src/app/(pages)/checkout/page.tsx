@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { StaticImageData } from "next/image";
 import BillingForm from "@/components/checkout/BillingForm";
 import PaymentOptions from "@/components/checkout/PaymentOptions";
@@ -9,10 +10,8 @@ import OrderSummary from "@/components/checkout/OrderSummary";
 import BackToTop from "@/components/BackToTop";
 import Modal from "@/components/ui/Modal";
 import Toast, { ToastType } from "@/components/ui/Toast";
-
-// Import sample images for demo
-import Image1 from "@/assets/imgs/category-7.jpg";
-import Image2 from "@/assets/imgs/category-8.jpg";
+import { useCart } from "@/context/CartContext";
+import { isValidEmail, isValidPhone } from "@/lib/cart-utils";
 
 // Types
 export type BillingData = {
@@ -42,6 +41,8 @@ const pageMetadata = {
 };
 
 export default function CheckoutPage() {
+  const router = useRouter();
+  const { items, totals, clearCart } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -61,18 +62,21 @@ export default function CheckoutPage() {
   const [orderNotes, setOrderNotes] = useState("");
   const [formErrors, setFormErrors] = useState<Partial<BillingData>>({});
 
-  // Demo cart items (in real app, get from cart state/context)
-  const [orderItems] = useState<OrderItem[]>([
-    { id: 1, name: "Shimmery Shirt", price: 150, imageSrc: Image1, quantity: 1 },
-    { id: 2, name: "Check Shirt", price: 250, imageSrc: Image2, quantity: 1 },
-  ]);
+  // Convert cart items to order items
+  const orderItems: OrderItem[] = items.map(item => ({
+    id: item.id,
+    name: item.name,
+    price: item.price,
+    imageSrc: item.imageSrc,
+    quantity: item.quantity,
+  }));
 
-  // Calculate totals
-  const subTotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discount = subTotal > 500 ? subTotal * 0.1 : 0;
-  const tax = (subTotal - discount) * 0.08;
-  const shipping = subTotal >= 50 ? 0 : 10;
-  const total = subTotal - discount + tax + shipping;
+  // Redirect if cart is empty
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push('/cart');
+    }
+  }, [items, router]);
 
   // Form validation
   const validateForm = (): boolean => {
@@ -83,11 +87,13 @@ export default function CheckoutPage() {
     if (!billingData.address.trim()) errors.address = "Address is required";
     if (!billingData.email.trim()) {
       errors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingData.email)) {
+    } else if (!isValidEmail(billingData.email)) {
       errors.email = "Invalid email format";
     }
     if (!billingData.phone.trim()) {
       errors.phone = "Phone number is required";
+    } else if (!isValidPhone(billingData.phone)) {
+      errors.phone = "Invalid phone number";
     }
 
     setFormErrors(errors);
@@ -107,13 +113,15 @@ export default function CheckoutPage() {
     setTimeout(() => {
       setIsProcessing(false);
       setIsModalOpen(true);
+      // Clear cart after successful order
+      clearCart();
     }, 1500);
   };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    // In real app, redirect to order confirmation page
-    // router.push('/order-confirmation');
+    // Redirect to home page after order
+    router.push('/');
   };
 
   return (
@@ -195,11 +203,11 @@ export default function CheckoutPage() {
               <div className="lg:sticky lg:top-24">
                 <OrderSummary
                   items={orderItems}
-                  subTotal={subTotal}
-                  shipping={shipping}
-                  discount={discount}
-                  tax={tax}
-                  total={total}
+                  subTotal={totals.subTotal}
+                  shipping={totals.shipping}
+                  discount={totals.discount}
+                  tax={totals.tax}
+                  total={totals.total}
                   onPlaceOrder={handlePlaceOrder}
                   isProcessing={isProcessing}
                 />
@@ -213,7 +221,7 @@ export default function CheckoutPage() {
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-gray-600">Total:</span>
             <span className="text-xl font-bold text-gray-900">
-              {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(total)}
+              {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(totals.total)}
             </span>
           </div>
           <button

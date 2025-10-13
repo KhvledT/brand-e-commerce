@@ -4,6 +4,8 @@ import "./globals.css";
 import HeaderNav from "@/components/HeaderNav";
 import PageFooter from "@/components/PageFooter";
 import AnnouncementBar from "@/components/AnnouncementBar";
+import { CartProvider } from "@/context/CartContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -31,12 +33,18 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${zenDots.variable} font-sans antialiased bg-gray-50 text-gray-900`}
       >
-        <div className="flex flex-col min-h-screen">
-          <AnnouncementBar />
-          <HeaderNav />
-            {children}
-          <PageFooter />
-        </div>
+        <CartProvider>
+          <WishlistProvider>
+            <div className="flex flex-col min-h-screen bg-[#EEEAE7]">
+              <AnnouncementBar />
+              <HeaderNav />
+              <div className="xl:max-w-7xl xl:mx-auto">
+                {children}
+              </div>
+              <PageFooter />
+            </div>
+          </WishlistProvider>
+        </CartProvider>
       </body>
     </html>
   );

@@ -2,14 +2,13 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image1 from "@/assets/imgs/category-7.jpg";
-import Image2 from "@/assets/imgs/category-8.jpg";
 import CartTable, { CartItem } from "@/components/cart/CartTable";
 import CartTotals from "@/components/cart/CartTotals";
 import CouponCodePanel from "@/components/cart/CouponCodePanel";
 import BackToTop from "@/components/BackToTop";
 import Modal from "@/components/ui/Modal";
 import Toast, { ToastType } from "@/components/ui/Toast";
+import { useCart } from "@/context/CartContext";
 
 // SEO Metadata (would be in metadata export in real app)
 const pageMetadata = {
@@ -19,17 +18,14 @@ const pageMetadata = {
 
 export default function CartPage() {
   const router = useRouter();
-  const [items, setItems] = useState<CartItem[]>([
-    { id: 1, name: "Shimmery Shirt", price: 150, originalPrice: 200, imageSrc: Image1, quantity: 1 },
-    { id: 2, name: "Check Shirt", price: 250, imageSrc: Image2, quantity: 3 },
-  ]);
+  const { items, removeItem: removeFromCart, updateQuantity, totals } = useCart();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [itemToRemove, setItemToRemove] = useState<CartItem["id"] | null>(null);
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
-  const removeItem = (id: CartItem["id"]) => {
+  const handleRemoveItem = (id: CartItem["id"]) => {
     setItemToRemove(id);
     setIsRemoveModalOpen(true);
   };
@@ -37,28 +33,17 @@ export default function CartPage() {
   const confirmRemove = () => {
     if (itemToRemove !== null) {
       const item = items.find(i => i.id === itemToRemove);
-      setItems((prev) => prev.filter((i) => i.id !== itemToRemove));
+      removeFromCart(itemToRemove);
       setIsRemoveModalOpen(false);
       setItemToRemove(null);
       setToast({ message: `${item?.name || 'Item'} removed from cart`, type: 'success' });
     }
   };
 
-  const updateQty = (id: CartItem["id"], q: number) => {
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: q } : i)));
+  const handleUpdateQty = (id: CartItem["id"], q: number) => {
+    updateQuantity(id, q);
     setToast({ message: 'Quantity updated', type: 'success' });
   };
-
-  const subTotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  
-  // Dynamic discount calculation (10% off orders over $500)
-  const discount = subTotal > 500 ? subTotal * 0.1 : 0;
-  
-  // Dynamic tax calculation (8% sales tax)
-  const tax = (subTotal - discount) * 0.08;
-  
-  // Dynamic shipping (free over $50)
-  const shipping = subTotal >= 50 ? 0 : 10;
 
   const handleCheckout = () => {
     // Navigate to checkout page
@@ -170,15 +155,15 @@ export default function CartPage() {
               <div className="lg:col-span-8">
                 <CartTable 
                   items={items} 
-                  onRemove={removeItem} 
-                  onUpdateQuantity={updateQty}
+                  onRemove={handleRemoveItem} 
+                  onUpdateQuantity={handleUpdateQty}
                   onUpdateCart={handleUpdateCart}
                 />
               </div>
               <div className="lg:col-span-4 space-y-6">
                 <div className="lg:sticky lg:top-24">
                   <CartTotals 
-                    totals={{ subTotal, shipping, discount, tax }} 
+                    totals={totals} 
                     onCheckout={handleCheckout}
                   />
                   <div className="mt-6">

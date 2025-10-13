@@ -5,6 +5,8 @@ import Image, { StaticImageData } from "next/image";
 import { Heart } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import Toast, { ToastType } from "@/components/ui/Toast";
+import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 
 type VariantImage = StaticImageData | string;
 type StockStatus = "in-stock" | "out-of-stock" | "low-stock";
@@ -31,13 +33,12 @@ export default function ProductInfo({
   colorImages = [],
   stock = 15,
   stockStatus = "in-stock",
-  onAddToCart,
-  onAddToWishlist,
 }: ProductInfoProps) {
+  const { addItem } = useCart();
+  const { toggleItem, isInWishlist } = useWishlist();
   const [size, setSize] = useState("Medium");
   const [qty, setQty] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
@@ -49,7 +50,16 @@ export default function ProductInfo({
     
     // Simulate API call
     setTimeout(() => {
-      onAddToCart?.(qty);
+      const cartItem = {
+        id: sku || name,
+        name,
+        price,
+        originalPrice,
+        imageSrc: colorImages[0] || '',
+        quantity: qty,
+        size,
+      };
+      addItem(cartItem);
       setIsAddingToCart(false);
       setShowModal(true);
       setToast({ message: `${name} added to cart!`, type: "success" });
@@ -57,14 +67,21 @@ export default function ProductInfo({
   };
 
   const handleAddToWishlist = async () => {
-    setIsAddingToWishlist(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      onAddToWishlist?.();
-      setIsAddingToWishlist(false);
-      setToast({ message: `${name} added to wishlist!`, type: "success" });
-    }, 600);
+    const wishlistItem = {
+      id: sku || name,
+      name,
+      price,
+      originalPrice,
+      imageSrc: colorImages[0] || '',
+      sku,
+    };
+    toggleItem(wishlistItem);
+    setToast({ 
+      message: isInWishlist(sku || name) 
+        ? `${name} removed from wishlist` 
+        : `${name} added to wishlist!`, 
+      type: "success" 
+    });
   };
 
   return (
@@ -169,11 +186,14 @@ export default function ProductInfo({
           </button>
           <button
             onClick={handleAddToWishlist}
-            disabled={isAddingToWishlist}
-            className="w-full h-12 rounded-[3px] font-bold border-2 border-gray-900 text-gray-900 text-sm hover:bg-gray-900 hover:text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 flex items-center justify-center gap-2"
+            className={`w-full h-12 rounded-[3px] font-bold border-2 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 flex items-center justify-center gap-2 ${
+              isInWishlist(sku || name)
+                ? "border-red-600 bg-red-600 text-white hover:bg-red-700 hover:border-red-700"
+                : "border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white"
+            }`}
           >
-            <Heart className="h-4 w-4" />
-            {isAddingToWishlist ? "ADDING..." : "ADD TO WISHLIST"}
+            <Heart className="h-4 w-4" fill={isInWishlist(sku || name) ? "currentColor" : "none"} />
+            {isInWishlist(sku || name) ? "IN WISHLIST" : "ADD TO WISHLIST"}
           </button>
         </div>
 

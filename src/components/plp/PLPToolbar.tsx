@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { SlidersHorizontal, Search, ChevronDown } from "lucide-react";
-
-type SortOption = "popular" | "price-asc" | "price-desc" | "newest";
+import { SortOption } from "@/types";
 
 type PLPToolbarProps = {
   onOpenFilters: () => void;
@@ -65,6 +64,8 @@ export default function PLPToolbar({
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
               <option value="newest">Newest</option>
+              <option value="name-asc">Name: A-Z</option>
+              <option value="name-desc">Name: Z-A</option>
             </select>
             <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
           </div>

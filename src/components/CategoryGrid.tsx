@@ -4,12 +4,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Modal from './ui/Modal';
 
-import category1 from '@/assets/imgs/category-1.png';
-import category2 from '@/assets/imgs/category-2.png';
-import category3 from '@/assets/imgs/category-3.png';
-import category4 from '@/assets/imgs/category-4.png';
-import category5 from '@/assets/imgs/category-5.png';
-import category6 from '@/assets/imgs/category-6.png';
+import category1 from '@/assets/imgs/category-1.jpg';
+import category2 from '@/assets/imgs/category-2.jpg';
+import category3 from '@/assets/imgs/category-3.jpg';
+import category4 from '@/assets/imgs/category-4.jpg';
+import category5 from '@/assets/imgs/category-5.jpg';
+import category6 from '@/assets/imgs/category-6.jpg';
 import category7 from '@/assets/imgs/category-7.jpg';
 import category8 from '@/assets/imgs/category-8.jpg';
 import category9 from '@/assets/imgs/category-9.jpg';
@@ -61,7 +61,7 @@ const CategoryGrid = () => {
                 className="group"
                 aria-label={`Shop ${category.name} - ${category.description}`}
               >
-                <div className="relative aspect-square overflow-hidden rounded-lg shadow-sm group-hover:shadow-xl transition-all duration-300">
+                <div className="relative min-h-[220px] overflow-hidden  shadow-sm group-hover:shadow-xl transition-all duration-300">
                   <Image
                     src={category.image}
                     alt={`${category.name} collection - ${category.description}`}

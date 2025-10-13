@@ -87,7 +87,7 @@ export default function PDPPage() {
   const related = Array.from({ length: 3 }).map((_, i) => ({
     id: i + 1,
     name: i === 0 ? "Cotton Crew Sweater" : i === 1 ? "Classic Tee" : "Striped Shirt",
-    price: "$200.00",
+    price: 200,
     imageSrc: i % 2 === 0 ? category1 : category2,
   }));
 
@@ -115,7 +115,7 @@ export default function PDPPage() {
 
       <BackToTop />
 
-      <main className="bg-[#EEEAE7] text-gray-900">
+      <main className="bg-[#EEEAE7] text-gray-900 xl:px-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="mb-6 sm:mb-8">

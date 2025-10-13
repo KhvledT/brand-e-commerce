@@ -9,7 +9,7 @@ import MobileFiltersDrawer from "@/components/plp/MobileFiltersDrawer";
 import PLPToolbar from "@/components/plp/PLPToolbar";
 import ProductGrid from "@/components/plp/ProductGrid";
 import Pagination from "@/components/plp/Pagination";
-import type { StaticImageData } from "next/image";
+import { Product, SortOption } from "@/types";
 
 // Import different product images for variety
 import category1 from "@/assets/imgs/category-1.png";
@@ -36,21 +36,12 @@ const productNames = [
   "The Classic Tee",
 ];
 
-const fakeProducts = Array.from({ length: 24 }).map((_, i) => ({
+const fakeProducts: Product[] = Array.from({ length: 24 }).map((_, i) => ({
   id: i + 1,
   name: productNames[i % productNames.length],
   price: Math.floor(Math.random() * (200 - 35) + 35),
   imageSrc: productImages[i % productImages.length],
 }));
-
-type SortOption = "popular" | "price-asc" | "price-desc" | "newest";
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  imageSrc: string | StaticImageData;
-};
 
 // SEO Metadata (would be exported from layout in real implementation)
 const pageMetadata = {
@@ -72,13 +63,22 @@ export default function ProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("popular");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
 
-  // Sort products
+  // Filter and sort products
   const sortedProducts = useMemo(() => {
-    const products = [...fakeProducts];
+    let products = [...fakeProducts];
     
+    // Apply search filter
+    if (searchQuery) {
+      products = products.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply sorting
     switch (sortBy) {
       case "price-asc":
         return products.sort((a, b) => a.price - b.price);
@@ -86,11 +86,15 @@ export default function ProductsPage() {
         return products.sort((a, b) => b.price - a.price);
       case "newest":
         return products.reverse();
+      case "name-asc":
+        return products.sort((a, b) => a.name.localeCompare(b.name));
+      case "name-desc":
+        return products.sort((a, b) => b.name.localeCompare(a.name));
       case "popular":
       default:
         return products;
     }
-  }, [sortBy]);
+  }, [sortBy, searchQuery]);
 
   // Paginate products
   const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
@@ -112,14 +116,8 @@ export default function ProductsPage() {
     setIsModalOpen(false);
   };
 
-  const handleQuickView = (product: { id: number | string; name: string; price: string | number; imageSrc?: string | StaticImageData }) => {
-    const numericPrice = typeof product.price === 'string' ? parseInt(product.price.replace('$', '')) : product.price;
-    setQuickViewProduct({
-      id: typeof product.id === 'string' ? parseInt(product.id) : product.id,
-      name: product.name,
-      price: numericPrice,
-      imageSrc: product.imageSrc || category1
-    });
+  const handleQuickView = (product: Product) => {
+    setQuickViewProduct(product);
   };
 
   return (
@@ -143,12 +141,12 @@ export default function ProductsPage() {
       <QuickViewModal
         isOpen={!!quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
-        product={quickViewProduct ? { ...quickViewProduct, price: `$${quickViewProduct.price}` } : null}
+        product={quickViewProduct}
       />
 
       <BackToTop />
 
-      <main className="bg-[#EEEAE7] text-gray-900">
+      <main className="bg-[#EEEAE7] text-gray-900 xl:min-w-7xl mx-auto">
         {/* Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <ol className="flex items-center space-x-2 text-sm">
@@ -180,10 +178,7 @@ export default function ProductsPage() {
               />
 
               <ProductGrid 
-                products={paginatedProducts.map(p => ({
-                  ...p,
-                  price: `$${p.price}`
-                }))} 
+                products={paginatedProducts} 
                 onQuickView={handleQuickView}
               />
 
